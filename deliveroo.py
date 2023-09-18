@@ -1,0 +1,127 @@
+import requests
+import sys
+import time
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from tkinter import Tk
+
+
+
+class Deliveroo:
+    order_num = ''
+    email = ''
+    password = ''
+    api_key = ''
+
+    def set_up(self):
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--incognito")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--ignore-certificate-errors')
+        chrome_options.add_argument('--allow-running-insecure-content')
+        chrome_options.add_argument("--window-size=1920,1080")
+        return chrome_options
+
+    def get_temp_mail(self):
+
+        driver = webdriver.Chrome(options=self.set_up())
+        driver.delete_all_cookies()
+        driver.get("https://temp-mail.org/en/")
+
+        element = driver.find_element(By.XPATH, "//button[@class='btn-rds icon-btn bg-theme click-to-copy copyIconGreenBtn']")
+        wait = WebDriverWait(driver, timeout=10)
+        wait.until(lambda d : element.is_enabled())
+        element.click()
+        self.email = Tk().clipboard_get()
+        return Tk().clipboard_get()
+
+    def get_sms(self):
+        with open('api_key.txt','r') as f:
+            self.api_key = f.read()
+
+        response = requests.get(f"https://juicysms.com/api/makeorder?key={self.api_key}&serviceId=19&country=UK")
+
+        if "NO_BALANCE" in  response.text:
+            print("No Money in account")
+            sys.exit(1)
+
+        if "ORDER_ALREADY_OPEN_"  in response.text:
+            print("Order already open")
+            sys.exit(1)
+
+
+        order_num = response.text.lstrip("ORDER_ID_").split("_")[0]
+
+        number = response.text.split("NUMBER_")[1]
+        
+        self.order_num = order_num
+        return number
+        
+    def get_code(self):
+        response = requests.get(f"https://juicysms.com/api/getsms?key={self.api_key}&orderId={self.order_num}")
+        while "WAITING" in response.text:
+            response = requests.get(f"https://juicysms.com/api/getsms?key={self.api_key}&orderId={self.order_num}")
+            time.sleep(1)
+        if "ORDER_EXPIRED" in response.text:
+            print("order expired")
+            sys.exit(1)
+        return response.text.split(":")[1].split("/")[0].strip(" ")
+
+    def get_deliveroo(self):
+        driver = webdriver.Chrome(options=self.set_up())
+        driver.get("https://deliveroo.co.uk/login?redirect=%2F")
+        element = driver.find_element(By.ID,"continue-with-email")
+        element.click()
+
+        element = driver.find_element(By.ID,"email-address")
+        element.send_keys(self.get_temp_mail())
+        element.send_keys(Keys.ENTER)
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME,"phone_number"))
+                                    ).send_keys(self.get_sms())
+        
+        element = driver.find_element(By.NAME,"phone_number")
+        element.send_keys(Keys.ENTER)
+
+
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME,"phone_code"))
+                                    ).send_keys(self.get_code())
+
+        element = driver.find_element(By.NAME,"phone_code")
+        element.send_keys(Keys.ENTER)
+
+
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,"firstName")))
+
+        element = driver.find_element(By.ID,"firstName")
+        element.send_keys("John")
+
+        element = driver.find_element(By.ID,"lastName")
+        element.send_keys("O")
+
+        element = driver.find_element(By.ID,"password")
+        element.send_keys("@Password123")
+
+        self.password = "@Password123"
+
+        try:
+            element = driver.find_element(By.XPATH, "//button[@class='ccl-388f3fb1d79d6a36 ccl-6d2d597727bd7bab ccl-59eced23a4d9e077 ccl-7be8185d0a980278']")
+            element.click()
+        except:
+            print("Create account not found")
+
+if __name__ == "__main__":
+    deliver = Deliveroo()
+    deliver.get_deliveroo()
+    with open('deliveroo.txt','a') as f:
+        f.write(deliver.email + '\n')
+        f.write(deliver.password + '\n')
+    
+    print("Account created!!!")  
+    print(deliver.email)  
+    print(deliver.password)
+    
+   
