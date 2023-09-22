@@ -26,10 +26,19 @@ class Deliveroo:
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_experimental_option("detach", True)
         return chrome_options
+    
+    def set_up_temp_mail(self):
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--incognito")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--ignore-certificate-errors')
+        chrome_options.add_argument('--allow-running-insecure-content')
+        chrome_options.add_argument("--window-size=1920,1080")
+        return chrome_options
 
     def get_temp_mail(self):
 
-        driver = webdriver.Chrome(options=self.set_up())
+        driver = webdriver.Chrome(options=self.set_up_temp_mail())
         driver.delete_all_cookies()
         driver.get("https://temp-mail.org/en/")
 
@@ -109,10 +118,15 @@ class Deliveroo:
         self.password = "@Password123"
 
         try:
-            element = driver.find_element(By.XPATH, "//button[@class='ccl-388f3fb1d79d6a36 ccl-6d2d597727bd7bab ccl-59eced23a4d9e077 ccl-7be8185d0a980278']")
+            element = driver.find_element(By.XPATH, "//span[contains(text(),'Create account')]")
+            element = element.find_element(By.XPATH,'..')
+            driver.execute_script("arguments[0].scrollIntoView();", element)
+            driver.execute_script("arguments[0].click();", element)
             element.click()
-        except:
-            print("Create account not found")
+            print("Account created!!!") 
+        except Exception as e:
+            print(e)
+            print("Create account button not found")
 
 if __name__ == "__main__":
     deliver = Deliveroo()
@@ -121,7 +135,7 @@ if __name__ == "__main__":
         f.write(deliver.email + '\n')
         f.write(deliver.password + '\n')
     
-    print("Account created!!!")  
+     
     print(deliver.email)  
     print(deliver.password)
     
