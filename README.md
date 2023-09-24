@@ -1,6 +1,6 @@
 Code to generate deliveroo account.
 
-Clone poject onto your machine
+Clone project onto your machine
 
 Add file api_key.txt file containing just the api key for juicy sms.
 https://juicysms.com/myaccount <-- Generate key using this link should be in the account section
