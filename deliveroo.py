@@ -63,6 +63,8 @@ class Deliveroo:
             print("Order already open")
             sys.exit(1)
 
+        if "NO_PHONE_AVAILABLE" in response.text:
+            print("No phone available")
 
         order_num = response.text.lstrip("ORDER_ID_").split("_")[0]
 
@@ -90,21 +92,21 @@ class Deliveroo:
         element = driver.find_element(By.ID,"email-address")
         element.send_keys(self.get_temp_mail())
         element.send_keys(Keys.ENTER)
-        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME,"phone_number"))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME,"phone_number"))
                                     ).send_keys(self.get_sms())
         
         element = driver.find_element(By.NAME,"phone_number")
         element.send_keys(Keys.ENTER)
 
 
-        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.NAME,"phone_code"))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME,"phone_code"))
                                     ).send_keys(self.get_code())
 
         element = driver.find_element(By.NAME,"phone_code")
         element.send_keys(Keys.ENTER)
 
 
-        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID,"firstName")))
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"firstName")))
 
         element = driver.find_element(By.ID,"firstName")
         element.send_keys("John")
@@ -126,7 +128,7 @@ class Deliveroo:
             print("Account created!!!") 
         except Exception as e:
             print(e)
-            print("Create account button not found")
+            print("Create account button not  found")
 
 if __name__ == "__main__":
     deliver = Deliveroo()
