@@ -143,8 +143,8 @@ class Deliveroo:
             print("Create account button not  found")
 
 if __name__ == "__main__":
-    os.system("echo enter your password") #DELETE
-    os.system("safaridriver --enable") #if password is failing copy this in terminal (#DELETE)
+    # os.system("echo enter your password") #DELETE
+    # os.system("safaridriver --enable") #if password is failing copy this in terminal (#DELETE)
     #DELETE ABOVE LINES ONCE YOUVE DONE IT ONCE
     deliver = Deliveroo()
     deliver.get_deliveroo()

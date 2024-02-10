@@ -16,3 +16,5 @@ If password is not being accepted and you sure it's correct run "safaridriver --
 delete lines 146 and 147 once youve run it once and password is accepted
 
 Click close session to when continuing to use safari 
+
+When you accept cookies, it seems to allow apple pay more often that not
