@@ -1,3 +1,5 @@
+# Read this for details and troubleshooting!
+
 Code to generate deliveroo account.
 
 Clone project onto your machine
