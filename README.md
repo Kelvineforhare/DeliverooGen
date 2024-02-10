@@ -9,3 +9,6 @@ type "pip install -r requirements.txt" to install dependencies (no speech marks)
 
 type "python3 deliveroo.py" to run program (no speech marks), once proceess is complete text file will be made with account email and password, along with a chrome window open with the account
 
+run "safaridriver --enable" in terminal to make this run if it doesnt work in the code
+
+Click close session to when continuing to use safari 

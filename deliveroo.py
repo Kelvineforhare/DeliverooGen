@@ -1,6 +1,7 @@
 import requests
 import sys
 import time
+import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -18,14 +19,14 @@ class Deliveroo:
     api_key = ''
 
     def set_up(self):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--incognito")
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_argument('--ignore-certificate-errors')
-        chrome_options.add_argument('--allow-running-insecure-content')
-        chrome_options.add_argument("--window-size=1920,1080")
-        chrome_options.add_experimental_option("detach", True)
-        return chrome_options
+        options = webdriver.SafariOptions()
+        options.add_argument("--incognito")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--allow-running-insecure-content')
+        options.add_argument("--window-size=1920,1080")
+        #options.add_experimental_option("detach", True)
+        return options
     
     def set_up_temp_mail(self):
         chrome_options = webdriver.ChromeOptions()
@@ -84,12 +85,17 @@ class Deliveroo:
         return response.text.split(":")[1].split("/")[0].strip(" ")
 
     def get_deliveroo(self):
-        driver = webdriver.Chrome(options=self.set_up())
+        driver = webdriver.Safari(options=self.set_up())
+        driver.maximize_window()
         driver.get("https://deliveroo.co.uk/login?redirect=%2F")
-        element = driver.find_element(By.ID,"continue-with-email")
-        element.click()
 
-        element = driver.find_element(By.ID,"email-address")
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"continue-with-email"))
+                                    )
+        WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID,"continue-with-email"))
+                                    ).click()
+        WebDriverWait(driver, 10).until
+        element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,"email-address"))
+                                    )
         element.send_keys(self.get_temp_mail())
         element.send_keys(Keys.ENTER)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME,"phone_number"))
@@ -125,20 +131,27 @@ class Deliveroo:
             driver.execute_script("arguments[0].scrollIntoView();", element)
             driver.execute_script("arguments[0].click();", element)
             element.click()
+            print(deliver.email)  
+            print(deliver.password)
             print("Account created!!!") 
+            with open('deliveroo.txt','a') as f:
+                f.write(deliver.email + '\n')
+                f.write(deliver.password + '\n')
+            input("Enter to close the browser")
         except Exception as e:
             print(e)
             print("Create account button not  found")
 
 if __name__ == "__main__":
+    os.system("echo enter your password") #DELETE
+    os.system("safaridriver --enable") #if password is failing copy this in terminal (#DELETE)
+    #DELETE ABOVE LINES ONCE YOUVE DONE IT ONCE
     deliver = Deliveroo()
     deliver.get_deliveroo()
-    with open('deliveroo.txt','a') as f:
-        f.write(deliver.email + '\n')
-        f.write(deliver.password + '\n')
+    
     
      
-    print(deliver.email)  
-    print(deliver.password)
+    
+    
     
    
